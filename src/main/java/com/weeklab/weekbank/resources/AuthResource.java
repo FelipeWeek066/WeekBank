@@ -5,7 +5,9 @@ import com.weeklab.weekbank.entities.DTOs.LoginResponseDTO;
 import com.weeklab.weekbank.entities.DTOs.RegisterDTO;
 import com.weeklab.weekbank.entities.User;
 import com.weeklab.weekbank.repositories.UserRepository;
+import com.weeklab.weekbank.resources.handlers.ExceptionHandlers;
 import com.weeklab.weekbank.services.TokenService;
+import com.weeklab.weekbank.services.exceptions.NameAlreadyChoosenException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,6 +17,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.net.URI;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthResource {
@@ -36,8 +41,9 @@ public class AuthResource {
 
     @PostMapping("/register")
     public ResponseEntity<Void> register(@RequestBody RegisterDTO register){
-        if(repository.findByName(register.getLogin()) != null){
-            return ResponseEntity.badRequest().build();
+        System.out.println(repository.findByName(register.getLogin()));
+        if(repository.findByName(register.getLogin()).isPresent()){
+            throw new NameAlreadyChoosenException("this name was already taken.");
         }else{
             String encryptedPassword = new BCryptPasswordEncoder().encode(register.getPassword());
             User user = new User(register.getLogin(), encryptedPassword, register.getRole());

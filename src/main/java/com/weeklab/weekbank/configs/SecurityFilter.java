@@ -2,6 +2,7 @@ package com.weeklab.weekbank.configs;
 
 import com.weeklab.weekbank.repositories.UserRepository;
 import com.weeklab.weekbank.services.TokenService;
+import com.weeklab.weekbank.services.exceptions.ContentNotFoundException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +26,7 @@ public class SecurityFilter extends OncePerRequestFilter {
         var token = this.recoverToken(request);
         if(token != null){
             var login = tokenService.validateToken(token);
-            UserDetails user = repository.findByName(login);
+            UserDetails user = repository.findByName(login).orElseThrow(() -> new ContentNotFoundException(""));
 
             var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);

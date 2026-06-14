@@ -13,6 +13,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 @Entity
 @Data
@@ -32,6 +33,9 @@ public class User implements Serializable, UserDetails {
     private String password;
     private UserRole role;
     int amount;
+    @OneToMany
+    private Set<Deposit> transactions_History;
+
 
     private boolean deleted;
     public User(String name, String encryptedPassword, UserRole role) {
