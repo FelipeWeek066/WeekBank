@@ -2,7 +2,9 @@ package com.weeklab.weekbank.entities;
 
 import com.weeklab.weekbank.enums.UserRole;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import org.springframework.security.core.GrantedAuthority;
@@ -11,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -35,7 +38,7 @@ public class User implements Serializable, UserDetails {
     int amount;
     @OneToMany
     private Set<Deposit> transactions_History;
-
+    private LocalDateTime connectedAt;
 
     private boolean deleted;
     public User(String name, String encryptedPassword, UserRole role) {
@@ -57,6 +60,17 @@ public class User implements Serializable, UserDetails {
     @Override
     public String getPassword() {
         return password;
+    }
+
+    public void addAmount(int amount){
+        if(amount > 0) {
+            this.amount += amount;
+        }
+    }
+    public void remAmount(int amount){
+        if(this.amount - amount >= 0) {
+            this.amount -= amount;
+        }
     }
 
     @Override

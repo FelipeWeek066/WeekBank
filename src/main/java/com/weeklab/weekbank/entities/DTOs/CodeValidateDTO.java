@@ -1,18 +1,13 @@
 package com.weeklab.weekbank.entities.DTOs;
 
-import com.weeklab.weekbank.enums.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class RegisterDTO implements Serializable
-{
+@NoArgsConstructor
+public class CodeValidateDTO implements Serializable {
     private String code;
-    private String login;
-    private String password;
-    private UserRole role;
 }

@@ -1,12 +1,17 @@
 package com.weeklab.weekbank.resources;
 
 import com.weeklab.weekbank.entities.DTOs.AuthDTO;
+import com.weeklab.weekbank.entities.DTOs.CodeValidateDTO;
 import com.weeklab.weekbank.entities.DTOs.LoginResponseDTO;
 import com.weeklab.weekbank.entities.DTOs.RegisterDTO;
+import com.weeklab.weekbank.entities.Deposit;
 import com.weeklab.weekbank.entities.User;
+import com.weeklab.weekbank.entities.UserCode;
+import com.weeklab.weekbank.repositories.UserCodeRepository;
 import com.weeklab.weekbank.repositories.UserRepository;
-import com.weeklab.weekbank.resources.handlers.ExceptionHandlers;
 import com.weeklab.weekbank.services.TokenService;
+import com.weeklab.weekbank.services.UserService;
+import com.weeklab.weekbank.services.exceptions.ContentNotFoundException;
 import com.weeklab.weekbank.services.exceptions.NameAlreadyChoosenException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +22,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/auth")
@@ -27,7 +35,11 @@ public class AuthResource {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private UserRepository repository;
+    private UserService userService;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private UserCodeRepository codeRepository;
     @Autowired
     private TokenService tokenService;
 
@@ -39,16 +51,33 @@ public class AuthResource {
         return ResponseEntity.ok(new LoginResponseDTO(token));
     }
 
+    @PostMapping("/checkCode")
+    public ResponseEntity<User> validate(@RequestBody CodeValidateDTO code){
+       //to implement
+        UserCode userCode = codeRepository.findByCode(code.getCode()).orElseThrow(() -> new ContentNotFoundException("invalid code: " + code.getCode()));
+        User user = new User(userCode.getName(), null, userCode.getRole());
+        user.setDeleted(false);
+        user.setConnectedAt(LocalDateTime.now());
+        userService.insert((user));
+        codeRepository.deleteById(userCode.getId());
+        URI uri = ServletUriComponentsBuilder.fromPath("/users").path("/{id}").buildAndExpand(userCode.getId()).toUri();
+
+        return ResponseEntity.created(uri).build();
+    }
+
+    //change that
     @PostMapping("/register")
     public ResponseEntity<Void> register(@RequestBody RegisterDTO register){
-        System.out.println(repository.findByName(register.getLogin()));
-        if(repository.findByName(register.getLogin()).isPresent()){
+
+        if(userRepository.existsByName(register.getLogin())){
             throw new NameAlreadyChoosenException("this name was already taken.");
         }else{
             String encryptedPassword = new BCryptPasswordEncoder().encode(register.getPassword());
             User user = new User(register.getLogin(), encryptedPassword, register.getRole());
-            repository.save((user));
+            userService.insert((user));
             return ResponseEntity.ok().build();
         }
     }
+
+
 }

@@ -1,13 +1,8 @@
 package com.weeklab.weekbank;
 
-import com.weeklab.weekbank.entities.User;
-import com.weeklab.weekbank.services.DepositService;
 import com.weeklab.weekbank.services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import java.util.UUID;
 
 @SpringBootApplication
 public class WeekbankApplication {

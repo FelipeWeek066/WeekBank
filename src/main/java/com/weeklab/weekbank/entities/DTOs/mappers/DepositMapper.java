@@ -8,7 +8,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper()
 public interface DepositMapper {
     DepositMapper INSTANCE = Mappers.getMapper(DepositMapper.class);
 
@@ -17,5 +17,5 @@ public interface DepositMapper {
     @Mapping(target = "payee", source = "payee.name")
     DepositDTO depositToDTO(Deposit deposit);
 
-    List<DepositDTO> depositsToDtos(List<Deposit> deposits);
+    List<DepositDTO> depositsToDTOs(List<Deposit> deposits);
 }

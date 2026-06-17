@@ -4,8 +4,8 @@ import com.weeklab.weekbank.entities.Deposit;
 import com.weeklab.weekbank.entities.User;
 import com.weeklab.weekbank.repositories.DepositRepository;
 import com.weeklab.weekbank.repositories.UserRepository;
-import com.weeklab.weekbank.resources.DepositResource;
 import com.weeklab.weekbank.services.exceptions.ContentNotFoundException;
+import com.weeklab.weekbank.services.exceptions.MinimumBudgetTransferenceException;
 import com.weeklab.weekbank.services.exceptions.NotEnoughMoneyException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,7 +14,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -63,10 +62,25 @@ public class UserService implements UserDetailsService {
     }
 
     public Deposit deposit(Deposit deposit) {
-        if (deposit.getPayer().getAmount() >= deposit.getAmount()) {
-            return depositRepository.save(deposit);
+        if(deposit.getAmount() < 1) {
+            throw new MinimumBudgetTransferenceException("low quantity.");
         }
+
+        if (deposit.getPayer().getAmount() <= deposit.getAmount() ) {
             throw new NotEnoughMoneyException("no money.");
+        }
+
+
+        User payer = deposit.getPayer();
+        User payee = deposit.getPayee();
+        payer.remAmount(deposit.getAmount());
+        payee.addAmount(deposit.getAmount());
+        repository.save(payer);
+        repository.save(payee);
+
+        return depositRepository.save(deposit);
+
+
     }
 
 }

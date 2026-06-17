@@ -6,13 +6,13 @@ import com.weeklab.weekbank.entities.DTOs.mappers.UserMapper;
 import com.weeklab.weekbank.entities.Deposit;
 import com.weeklab.weekbank.entities.User;
 import com.weeklab.weekbank.services.UserService;
-import com.weeklab.weekbank.services.exceptions.ContentNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.time.Instant;
+import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -32,7 +32,9 @@ public class UserResource {
     }
     @PostMapping
     public ResponseEntity<Void> insert(@RequestBody User user){
-        service.insert(user);
+        user = service.insert(user);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(user.getId()).toUri();
+
         return ResponseEntity.noContent().build();
     }
 
