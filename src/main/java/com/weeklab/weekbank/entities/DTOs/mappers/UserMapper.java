@@ -3,6 +3,7 @@ package com.weeklab.weekbank.entities.DTOs.mappers;
 import com.weeklab.weekbank.entities.DTOs.UserDTO;
 import com.weeklab.weekbank.entities.User;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;

@@ -11,20 +11,30 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Map;
+import java.util.Objects;
+
 @Service
 public class TokenService {
     @Value("${api.security.token.security}")
     private String secret;
+    private int ExpirationTimeDays = 30;
 
     public String generateToken(User user) {
         try{
             Algorithm algorithm = Algorithm.HMAC256(secret);
-            String token = JWT.create().withIssuer("auth-api").withSubject(user.getUsername()).withExpiresAt(getExpirationDate()).sign(algorithm);
+            String token = JWT.create()
+                    .withIssuer("auth-api")
+                    .withSubject(user.getUsername())
+                    .withExpiresAt(getExpirationDate())
+                    .sign(algorithm);
             return token;
         }catch(JWTCreationException e){
             throw new RuntimeException("Error while generating Token");
         }
     }
+
+
 
     public String validateToken(String token){
         try{
@@ -36,6 +46,6 @@ public class TokenService {
     }
 
     private Instant getExpirationDate(){
-        return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));
+        return LocalDateTime.now().plusDays(ExpirationTimeDays).toInstant(ZoneOffset.of("-03:00"));
     }
 }

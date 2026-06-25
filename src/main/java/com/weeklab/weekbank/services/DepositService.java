@@ -1,11 +1,13 @@
 package com.weeklab.weekbank.services;
 
 import com.weeklab.weekbank.entities.Deposit;
+import com.weeklab.weekbank.entities.User;
 import com.weeklab.weekbank.repositories.DepositRepository;
 import com.weeklab.weekbank.services.exceptions.ContentNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,6 +20,9 @@ public class DepositService {
     public List<Deposit> findAll(){
         return repository.findAll();
     }
+    public List<Deposit> findByUser(User user){
+        return new ArrayList<>(repository.findByPayerOrPayee(user, user));
+    }
 
     public Deposit findById(UUID id) {
         return repository.findById(id).orElseThrow(() -> new ContentNotFoundException(id));
@@ -28,7 +33,6 @@ public class DepositService {
 
         return repository.save(deposit);
     }
-
     public void delete(UUID id) {
         findById(id);
         repository.deleteById(id);

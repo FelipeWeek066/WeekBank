@@ -1,10 +1,13 @@
 package com.weeklab.weekbank.resources;
 
+import com.weeklab.weekbank.entities.DTOs.DepositDTO;
 import com.weeklab.weekbank.entities.DTOs.DoDepositDTO;
 import com.weeklab.weekbank.entities.DTOs.UserDTO;
+import com.weeklab.weekbank.entities.DTOs.mappers.DepositMapper;
 import com.weeklab.weekbank.entities.DTOs.mappers.UserMapper;
 import com.weeklab.weekbank.entities.Deposit;
 import com.weeklab.weekbank.entities.User;
+import com.weeklab.weekbank.services.DepositService;
 import com.weeklab.weekbank.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,13 +25,23 @@ import java.util.UUID;
 public class UserResource {
     @Autowired
     private UserService service;
-    @GetMapping
+    @Autowired
+    private DepositService depositService;
+    @GetMapping()
     public ResponseEntity<List<UserDTO>> findAll(){
         return ResponseEntity.ok().body(UserMapper.INSTANCE.usersToUserDtos(service.findAll()));
     }
     @GetMapping(value = "/{id}")
     public ResponseEntity<UserDTO> findById(@PathVariable UUID id){
         return ResponseEntity.ok().body(UserMapper.INSTANCE.userToUserDTO(service.findById(id)));
+    }
+
+    @GetMapping(value = "/currentUser")
+    public ResponseEntity<UserDTO> findByName(Authentication authentication){
+
+        User tempUser = service.findByName(authentication.getName());
+        System.out.println(UserMapper.INSTANCE.userToUserDTO(tempUser));
+        return ResponseEntity.ok().body(UserMapper.INSTANCE.userToUserDTO(tempUser));
     }
     @PostMapping
     public ResponseEntity<Void> insert(@RequestBody User user){
@@ -46,13 +59,16 @@ public class UserResource {
 
     @PostMapping("/deposit")
     public ResponseEntity<Void> deposit(@RequestBody DoDepositDTO doDepositDTO, Authentication authentication){
-        System.out.println(authentication.getName());
-        System.out.println(service.findByName(authentication.getName()).getName());
-
         Deposit deposit = DoTransactionDTOToTransaction(doDepositDTO);
         deposit.setPayer(service.findByName(authentication.getName()));
         service.deposit(deposit);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/deposits")
+    public ResponseEntity<List<DepositDTO>> deposits(Authentication authentication){
+        User tempUser = service.findByName(authentication.getName());
+        return ResponseEntity.ok().body(DepositMapper.INSTANCE.depositsToDTOs(depositService.findByUser(tempUser)));
     }
 
     private Deposit DoTransactionDTOToTransaction(DoDepositDTO depositDto){

@@ -17,11 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -30,6 +28,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/auth")
+@CrossOrigin(origins = "http://localhost:4200")
 public class AuthResource {
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -48,8 +47,9 @@ public class AuthResource {
         var userPassword = new UsernamePasswordAuthenticationToken(login.getLogin(), login.getPassword());
         var auth = this.authenticationManager.authenticate(userPassword);
         var token = tokenService.generateToken((User) auth.getPrincipal());
-        return ResponseEntity.ok(new LoginResponseDTO(token));
+        return ResponseEntity.ok(new LoginResponseDTO(token, login.getLogin()));
     }
+
 
     @PostMapping("/checkCode")
     public ResponseEntity<User> validate(@RequestBody CodeValidateDTO code){
@@ -57,7 +57,7 @@ public class AuthResource {
         UserCode userCode = codeRepository.findByCode(code.getCode()).orElseThrow(() -> new ContentNotFoundException("invalid code: " + code.getCode()));
         User user = new User(userCode.getName(), null, userCode.getRole());
         user.setDeleted(false);
-        user.setConnectedAt(LocalDateTime.now());
+        user.setEntryDate(LocalDateTime.now());
         userService.insert((user));
         codeRepository.deleteById(userCode.getId());
         URI uri = ServletUriComponentsBuilder.fromPath("/users").path("/{id}").buildAndExpand(userCode.getId()).toUri();

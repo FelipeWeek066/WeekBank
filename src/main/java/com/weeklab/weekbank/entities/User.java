@@ -38,7 +38,7 @@ public class User implements Serializable, UserDetails {
     int amount;
     @OneToMany
     private Set<Deposit> transactions_History;
-    private LocalDateTime connectedAt;
+    private LocalDateTime entryDate;
 
     private boolean deleted;
     public User(String name, String encryptedPassword, UserRole role) {
