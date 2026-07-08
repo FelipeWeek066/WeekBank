@@ -32,9 +32,15 @@ public class SecurityConfiguration {
         return httpSecurity
                .cors(cors -> cors.configurationSource(request ->
                {var corsConfiguration = new CorsConfiguration();
-                    corsConfiguration.setAllowedOrigins(List.of("http://localhost:4200"));
+                    corsConfiguration.setAllowedOrigins(List.of(
+                            "https://mubank.org",
+                            "http://mubank.org",
+                            "http://172.17.0.1:4200",
+                            "http://localhost:4200",
+                            "http://127.0.0.1:4200"));
                     corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     corsConfiguration.setAllowedHeaders(List.of("*"));
+                    corsConfiguration.setExposedHeaders(List.of("Authorization", "Content-Type"));
                     corsConfiguration.setAllowCredentials(true);
                     return corsConfiguration;
                }
@@ -59,9 +65,13 @@ public class SecurityConfiguration {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:4200")
+                        .allowedOrigins("https://mubank.org",
+                                "http://mubank.org",
+                                "http://localhost:4200",
+                                "http://localhost:4000")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
+                        .exposedHeaders("Authorization")
                         .allowCredentials(true);
             }
         };

@@ -1,0 +1,7 @@
+services:
+  mubank_backend:
+    container_name: mubank_backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: week066/mubank_backend:latest

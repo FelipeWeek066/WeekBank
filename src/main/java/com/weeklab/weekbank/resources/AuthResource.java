@@ -52,17 +52,22 @@ public class AuthResource {
 
 
     @PostMapping("/checkCode")
-    public ResponseEntity<User> validate(@RequestBody CodeValidateDTO code){
-       //to implement
+    public ResponseEntity<LoginResponseDTO> validate(@RequestBody CodeValidateDTO code){
+
         UserCode userCode = codeRepository.findByCode(code.getCode()).orElseThrow(() -> new ContentNotFoundException("invalid code: " + code.getCode()));
-        User user = new User(userCode.getName(), null, userCode.getRole());
+
+        String encryptedPassword = new BCryptPasswordEncoder().encode(code.getPassword());
+        User user = new User(userCode.getName(), encryptedPassword, userCode.getRole());
+        user.addAmount(userCode.getStartAmount());
         user.setDeleted(false);
         user.setEntryDate(LocalDateTime.now());
         userService.insert((user));
         codeRepository.deleteById(userCode.getId());
-        URI uri = ServletUriComponentsBuilder.fromPath("/users").path("/{id}").buildAndExpand(userCode.getId()).toUri();
-
-        return ResponseEntity.created(uri).build();
+        //URI uri = ServletUriComponentsBuilder.fromPath("/users").path("/{id}").buildAndExpand(userCode.getId()).toUri();
+        var userPassword = new UsernamePasswordAuthenticationToken(user.getName(), code.getPassword());
+        var auth = this.authenticationManager.authenticate(userPassword);
+        var token = tokenService.generateToken((User) auth.getPrincipal());
+        return ResponseEntity.ok(new LoginResponseDTO(token, user.getName()));
     }
 
     //change that

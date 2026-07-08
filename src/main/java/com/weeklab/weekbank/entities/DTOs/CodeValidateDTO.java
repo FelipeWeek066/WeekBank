@@ -10,4 +10,5 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class CodeValidateDTO implements Serializable {
     private String code;
+    private String password;
 }
