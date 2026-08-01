@@ -50,4 +50,11 @@ public class ExceptionHandlers {
         StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);
     }
+    @ExceptionHandler(DataIntegrityException.class)
+    public ResponseEntity<StandardError> dataIntegrity(DataIntegrityException e, HttpServletRequest request){
+        String error = "data integrity Exception";
+        HttpStatus status = HttpStatus.CONFLICT;
+        StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
 }

@@ -19,6 +19,7 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/users")
@@ -34,6 +35,12 @@ public class UserResource {
     @GetMapping(value = "/{id}")
     public ResponseEntity<UserDTO> findById(@PathVariable UUID id){
         return ResponseEntity.ok().body(UserMapper.INSTANCE.userToUserDTO(service.findById(id)));
+    }
+
+    @GetMapping(value = "/search")
+    public ResponseEntity<List<String>> findByNameContaining(@RequestParam(required = false, defaultValue = "") String search){
+        List<String> tempNames = service.findByNameContaining(search).stream().map(User::getUsername).toList();
+        return ResponseEntity.ok().body(tempNames);
     }
 
     @GetMapping(value = "/currentUser")
@@ -61,6 +68,8 @@ public class UserResource {
     public ResponseEntity<Void> deposit(@RequestBody DoDepositDTO doDepositDTO, Authentication authentication){
         Deposit deposit = DoTransactionDTOToTransaction(doDepositDTO);
         deposit.setPayer(service.findByName(authentication.getName()));
+        User payee = service.findByName(doDepositDTO.getPayee());
+        deposit.setPayee(payee);
         service.deposit(deposit);
         return ResponseEntity.noContent().build();
     }

@@ -1,10 +1,12 @@
 package com.weeklab.weekbank.services;
 
+import com.weeklab.weekbank.entities.DTOs.DoDepositDTO;
 import com.weeklab.weekbank.entities.Deposit;
 import com.weeklab.weekbank.entities.User;
 import com.weeklab.weekbank.repositories.DepositRepository;
 import com.weeklab.weekbank.repositories.UserRepository;
 import com.weeklab.weekbank.services.exceptions.ContentNotFoundException;
+import com.weeklab.weekbank.services.exceptions.DataIntegrityException;
 import com.weeklab.weekbank.services.exceptions.MinimumBudgetTransferenceException;
 import com.weeklab.weekbank.services.exceptions.NotEnoughMoneyException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,9 @@ public class UserService implements UserDetailsService {
 
     public List<User> findAll() {
         return repository.findAll();
+    }
+    public List<User> findByNameContaining(String src) {
+        return repository.findByNameContaining(src);
     }
 
     public User findById(UUID id) {
@@ -65,9 +70,11 @@ public class UserService implements UserDetailsService {
         if(deposit.getAmount() < 1) {
             throw new MinimumBudgetTransferenceException("low quantity.");
         }
-
         if (deposit.getPayer().getAmount() <= deposit.getAmount() ) {
             throw new NotEnoughMoneyException("no money.");
+        }
+        if (deposit.getPayee() == deposit.getPayer()) {
+            throw new DataIntegrityException("you cant send money to yourself");
         }
 
 
