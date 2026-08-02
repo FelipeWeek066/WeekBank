@@ -51,6 +51,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/checkCode").permitAll()
                         .requestMatchers(HttpMethod.GET, "/users/currentUser").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/users/search").authenticated()
                         .requestMatchers(HttpMethod.GET, "/users/deposits").authenticated()
                         .requestMatchers(HttpMethod.POST, "/codes").hasRole(("ADMIN"))
                         .requestMatchers(HttpMethod.GET, "/user").hasRole("ADMIN")

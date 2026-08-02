@@ -70,7 +70,7 @@ public class UserService implements UserDetailsService {
         if(deposit.getAmount() < 1) {
             throw new MinimumBudgetTransferenceException("low quantity.");
         }
-        if (deposit.getPayer().getAmount() <= deposit.getAmount() ) {
+        if (deposit.getPayer().getAmount() < deposit.getAmount() ) {
             throw new NotEnoughMoneyException("no money.");
         }
         if (deposit.getPayee() == deposit.getPayer()) {
