@@ -56,6 +56,11 @@ public class UserService implements UserDetailsService {
         repository.deleteById(id);
     }
 
+    public void deleteByName(String name) {
+        User user = findByName(name);
+        repository.deleteById(user.getId());
+    }
+
     public User update(UUID id, User obj) {
         User user = findById(id);
         updateData(user, obj);

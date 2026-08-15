@@ -58,9 +58,15 @@ public class UserResource {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id){
+    @DeleteMapping(value = "/id/{id}")
+    public ResponseEntity<Void> deleteById(@PathVariable UUID id){
         service.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping(value = "/{name}")
+    public ResponseEntity<Void> deleteByName(@PathVariable String name){
+        service.deleteByName(name);
         return ResponseEntity.noContent().build();
     }
 

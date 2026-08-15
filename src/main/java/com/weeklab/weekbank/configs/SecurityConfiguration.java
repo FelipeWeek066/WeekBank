@@ -48,7 +48,6 @@ public class SecurityConfiguration {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/checkCode").permitAll()
                         .requestMatchers(HttpMethod.GET, "/users/currentUser").authenticated()
                         .requestMatchers(HttpMethod.GET, "/users/search").authenticated()
@@ -56,6 +55,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, "/codes").hasRole(("ADMIN"))
                         .requestMatchers(HttpMethod.GET, "/user").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/deposits").hasRole(("ADMIN"))
+                        .requestMatchers(HttpMethod.DELETE, "/users").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
                 .build();

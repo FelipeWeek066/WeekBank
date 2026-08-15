@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -25,10 +27,14 @@ public class Deposit implements Serializable {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID Id;
     @Nonnull
-    @ManyToOne
+    @ManyToOne()
+    @JoinColumn(name = "payer_id")
+    @NotFound(action = NotFoundAction.IGNORE)
     private User payer;
     @Nonnull
-    @ManyToOne
+    @ManyToOne()
+    @JoinColumn(name = "payee_id")
+    @NotFound(action = NotFoundAction.IGNORE)
     private User payee;
     private int amount;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy'T'HH:mm'Z'")
